@@ -1,7 +1,7 @@
 const express=require("express");
 const bodyparser=require("body-parser")
 const mongoose=require("mongoose")
-const _ = require("loadash")
+const _ = require("lodash")
 const date=require(__dirname+"/date.js")
 
  
