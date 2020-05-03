@@ -1,7 +1,9 @@
 const express=require("express");
 const bodyparser=require("body-parser")
 const mongoose=require("mongoose")
+const _ = require("loadash")
 const date=require(__dirname+"/date.js")
+
  
 const app=express();
 let ejs = require('ejs')
@@ -87,18 +89,29 @@ app.post("/",function(request,response){
 
 app.post("/delete",function(req,res){
     const checkedItemId=req.body.checkboxvalue;
-    Item.findByIdAndRemove(checkedItemId,function(err){
-        console.log("The Checked Item has been successfully deleted");
-        
-    })
-    res.redirect("/");// this will direct to app.get("/")
+    const listName=req.body.listName;
+    if(listName==="Today"){
+        Item.findByIdAndRemove(checkedItemId,function(err){
+            console.log("The Checked Item has been successfully deleted");
+            
+        })
+        res.redirect("/");// this will direct to app.get("/")
+
+    }else{
+        List.findOneAndUpdate({customName:listName},{$pull:{items:{_id:checkedItemId}}},function(err){
+            if(!err){
+                res.redirect("/"+listName)
+            }
+        });
+    }
+   
     
 })
 
 //creating custom list
 
 app.get("/:customListName",function(req,res){
-const customListName=req.params.customListName
+const customListName=_.capitalize(req.params.customListName)
 
 List.findOne({customName:customListName},function(err,foundList){
     if(!err){
