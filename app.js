@@ -27,8 +27,8 @@ app.post("/",function(request,response){
         response.redirect('/')
     }
     
-    items.push(item)
-    response.redirect("/");
+    //items.push(item)
+   // response.redirect("/");
 })
 
 
