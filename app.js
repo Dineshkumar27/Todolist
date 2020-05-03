@@ -27,6 +27,12 @@ const Item3=new Item({
 
 const documents=[Item1,Item2,Item3];
 
+const ListSchema={
+    customName:String,
+    items: [Itemschema]
+}
+
+const List=mongoose.model("List",ListSchema)
 
 
 app.set("view engine",'ejs');
@@ -56,13 +62,27 @@ app.get("/",function(req,res){
 
 app.post("/",function(request,response){
     const newitem=request.body.newItem;
+    const listTitle=request.body.list
     const item=new Item({
         name: newitem
     })
-    item.save();
+    if(listTitle==="Today"){
+   
+        item.save();
+        response.redirect("/");// this will direct to app.get("/")
+
+    }
+    else{
     
-    //items.push(item)
-   response.redirect("/");// this will direct to app.get("/")
+        List.findOne({ customName:listTitle}, function(err,foundList){
+            foundList.items.push(item);
+            foundList.save()
+            response.redirect("/"+listTitle)
+            //console.log(foundList);
+            
+        })
+    }
+  
 })
 
 app.post("/delete",function(req,res){
@@ -71,10 +91,35 @@ app.post("/delete",function(req,res){
         console.log("The Checked Item has been successfully deleted");
         
     })
-    res.redirect("/")
+    res.redirect("/");// this will direct to app.get("/")
     
 })
 
+//creating custom list
+
+app.get("/:customListName",function(req,res){
+const customListName=req.params.customListName
+
+List.findOne({customName:customListName},function(err,foundList){
+    if(!err){
+        if(!foundList){
+            const list=new List({
+                customName:customListName,
+                items: documents
+            })
+            list.save();
+            res.redirect("/"+customListName)
+        }
+        else{
+           // console.log("Exist");
+           res.render("list",{listTitle:foundList.customName,newListItem:foundList.items})
+        }
+    }
+})
+    
+
+    
+})
 
 app.get("/work",function(req,res){
     res.render("list",{listTitle:"Work List",newListItem:workItems})
