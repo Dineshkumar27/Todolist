@@ -10,7 +10,7 @@ let ejs = require('ejs')
 let workItems=[];
 app.use(bodyparser.urlencoded({extended:true}))
 app.use(express.static("public"))
-mongoose.connect("mongodb://localhost:27017/todoListDB",{ useNewUrlParser: true })
+mongoose.connect("mongodb+srv://admin-dinesh:dinesh1342@cluster0-m0bhk.mongodb.net/todoListDB",{ useNewUrlParser: true })
 
 const Itemschema={
     name : String
@@ -143,6 +143,12 @@ app.post("/work",function(req,res){
     res.redirect("/work")
 
 })
-app.listen(3000,function(){
-    console.log("Server started in the port 3000")
+
+let port = process.env.PORT;
+if (port == null || port == "") {
+  port = 3000;
+}
+app.listen(port);
+app.listen(process.env.PORT,function(){
+    console.log("Server started Successfully")
 })
